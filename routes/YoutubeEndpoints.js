@@ -30,9 +30,8 @@ const listVideos = async videoId => {
 }
 
 const __ParseChannelVideos = channelData => {
-  const parsedData = {}
   return channelData.map((data, index) => {
-    parsedData[index] = {
+    const parsedData = {
       id: data.id.videoId,
       publishDate: data.snippet.publishedAt,
       title: data.snippet.title,

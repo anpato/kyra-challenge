@@ -1,5 +1,6 @@
 const express = require('express')
 const Router = require('./routes')
+const cors = require('cors')
 class Server {
   constructor(port, middleWare, baseroute) {
     this.app = express()
@@ -18,7 +19,8 @@ class Server {
   }
 
   init_middleWare() {
-    this.middleWare.forEach(middleware => this.app.use(middleware))
+    // this.middleWare.forEach(middleware => this.app.use(middleware))
+    this.app.use(cors())
   }
   init_routes() {
     this.app.use('/api', Router)

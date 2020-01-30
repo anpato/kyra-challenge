@@ -1,6 +1,13 @@
 import React, { Component } from 'react'
 import { AppState } from '../types'
-import { getData } from '../services'
+import { subscribeToFeed } from '../services'
+import Pusher from 'pusher-js'
+const {
+  REACT_APP_PUSHER_ID,
+  REACT_APP_PUSHER_KEY,
+  REACT_APP_PUSHER_SECRET,
+  REACT_APP_PUSHER_CLUSTER
+} = process.env
 export default class Wrapper extends Component<{}, AppState> {
   state: AppState = {
     channelInfo: []
@@ -8,12 +15,23 @@ export default class Wrapper extends Component<{}, AppState> {
 
   componentDidMount() {
     this.fetchVideos()
+    this.createPusher()
+  }
+
+  createPusher = () => {
+    const pusher = new Pusher(REACT_APP_PUSHER_KEY, {
+      appId: REACT_APP_PUSHER_ID,
+      secret: REACT_APP_PUSHER_SECRET,
+      cluster: REACT_APP_PUSHER_CLUSTER,
+      useTLS: true
+    })
+    const channel = pusher.subscribe('subscribe')
+    channel.bind('new-videos', (data: any[]) => console.log(data))
   }
 
   fetchVideos = async () => {
     try {
-      const channelInfo = await getData()
-
+      const channelInfo = await subscribeToFeed()
       console.log(channelInfo)
     } catch (error) {
       throw error
