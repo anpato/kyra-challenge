@@ -14,7 +14,7 @@ const getData = async pageToken => {
         ''}`
     )
     const data = await __ParseChannelVideos(resp.data.items)
-    return { nextPageToken: resp.data.nextPageToken, data }
+    return { nextPageToken: resp.data.nextPageToken, videos: data }
   } catch (error) {
     throw error
   }

@@ -5,10 +5,10 @@ const cron = require('node-cron')
 
 YoutubeRouter.post('/', async (req, res) => {
   try {
-    getData().then(data =>
+    getData().then(videos =>
       pusher.trigger('subscribe', 'new-videos', {
         message: 'connected',
-        resp: data
+        data: videos
       })
     )
   } catch (error) {

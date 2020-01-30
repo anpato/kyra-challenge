@@ -10,7 +10,8 @@ const {
 } = process.env
 export default class Wrapper extends Component<{}, AppState> {
   state: AppState = {
-    channelInfo: []
+    channelInfo: [],
+    nextPage: ''
   }
 
   componentDidMount() {
@@ -26,13 +27,17 @@ export default class Wrapper extends Component<{}, AppState> {
       useTLS: true
     })
     const channel = pusher.subscribe('subscribe')
-    channel.bind('new-videos', (data: any[]) => console.log(data))
+    channel.bind('new-videos', (resp: any) =>
+      this.setState({
+        channelInfo: resp.data.videos,
+        nextPage: resp.data.nextPageToken
+      })
+    )
   }
 
   fetchVideos = async () => {
     try {
-      const channelInfo = await subscribeToFeed()
-      console.log(channelInfo)
+      await subscribeToFeed()
     } catch (error) {
       throw error
     }
@@ -40,19 +45,18 @@ export default class Wrapper extends Component<{}, AppState> {
 
   renderVideos = () => {
     if (this.state.channelInfo.length) {
-      return this.state.channelInfo.map(videos => (
-        <div key={videos.id.videoId}>
-          <img
-            src={videos.snippet.thumbnails.default.url}
-            alt={videos.snippet.title}
-          />
-          <h3>{videos.snippet.title}</h3>
-        </div>
-      ))
+      return this.state.channelInfo.map(video => {
+        return (
+          <div key={video.id}>
+            <h3>{video.title}</h3>
+            <img src={video.thumbnail} alt={video.title} />
+          </div>
+        )
+      })
     }
   }
 
   render() {
-    return <div>{/* {this.renderVideos()} */}</div>
+    return <div>{this.renderVideos()}</div>
   }
 }
