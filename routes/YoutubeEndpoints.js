@@ -13,20 +13,26 @@ const getData = async pageToken => {
       `/search?key=${token}&channelId=UCvO6uJUVJQ6SrATfsWR5_aA&part=snippet,id&order=date&maxResults=20&pageToken=${pageToken ||
         ''}`
     )
-    const data = await __ParseChannelVideos(resp.data.items)
-    return { nextPageToken: resp.data.nextPageToken, videos: data }
+    const ids = await pullIds(resp.data.items)
+    return { nextPage: resp.data.nextPageToken, data: resp.data.items }
   } catch (error) {
     throw error
   }
 }
 
-const listVideos = async videoId => {
+const listVideos = async videoIds => {
   try {
     const resp = await Api.get(
-      `/videos?part=snippet,contentDetails,statistics&id=${videoId}&key=${token}`
+      `/videos?part=snippet,contentDetails,statistics&id=${videoIds}&key=${token}`
     )
     return resp.data.items
-  } catch (error) {}
+  } catch (error) {
+    throw error
+  }
+}
+
+const pullIds = data => {
+  return data.map(data => data.id.videoId)
 }
 
 const __ParseChannelVideos = channelData => {
@@ -37,21 +43,21 @@ const __ParseChannelVideos = channelData => {
       title: data.snippet.title,
       description: data.snippet.description,
       thumbnail: data.snippet.thumbnails.default.url
+      // stats: data.statistics
     }
     return parsedData
   })
 }
 
-// const __AssignVideoToData = async channelData => {
-//   const data = __ParseChannelVideos(channelData)
-//   let parsedData = []
-//   let ids = []
-//   for (let i = 0; i < data.length; i++) {
-//     const item = data[i]
-//     ids.push(item.id)
-//   }
-//   const videos = await listVideos(ids)
-//   console.log(videos)
-// }
+const FetchAllVideos = async () => {
+  try {
+    const { data, nextPage } = await getData()
+    // const videos = await listVideos(ids)
+    const videos = __ParseChannelVideos(data)
+    return { nextPageToken: nextPage, videos }
+  } catch (error) {
+    throw error
+  }
+}
 
-module.exports = getData
+module.exports = FetchAllVideos

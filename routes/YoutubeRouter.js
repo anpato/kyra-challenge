@@ -1,11 +1,11 @@
 const YoutubeRouter = require('express').Router()
-const getData = require('./YoutubeEndpoints')
+const FetchAllVideos = require('./YoutubeEndpoints')
 const pusher = require('../config/PusherConfig')
 const cron = require('node-cron')
 
 YoutubeRouter.post('/', async (req, res) => {
   try {
-    getData().then(videos =>
+    FetchAllVideos().then(videos =>
       pusher.trigger('subscribe', 'new-videos', {
         message: 'connected',
         data: videos

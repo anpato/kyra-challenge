@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { AppState } from '../types'
 import { subscribeToFeed } from '../services'
 import Pusher from 'pusher-js'
+import { Card } from './shared'
 const {
   REACT_APP_PUSHER_ID,
   REACT_APP_PUSHER_KEY,
@@ -44,19 +45,27 @@ export default class Wrapper extends Component<{}, AppState> {
   }
 
   renderVideos = () => {
-    if (this.state.channelInfo.length) {
+    if (this.state.channelInfo && this.state.channelInfo.length) {
       return this.state.channelInfo.map(video => {
         return (
-          <div key={video.id}>
-            <h3>{video.title}</h3>
-            <img src={video.thumbnail} alt={video.title} />
-          </div>
+          <Card key={video.id}>
+            <div className="text-wrapper">
+              <h3>{video.title}</h3>
+            </div>
+            <div className="image-wrapper">
+              <img src={video.thumbnail} alt={video.title} />
+            </div>
+          </Card>
         )
       })
     }
   }
 
   render() {
-    return <div>{this.renderVideos()}</div>
+    return (
+      <div className="wrapper">
+        <div className="card-wrapper">{this.renderVideos()}</div>
+      </div>
+    )
   }
 }
