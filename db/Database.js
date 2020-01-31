@@ -1,8 +1,9 @@
 const { connection, connect } = require('mongoose')
-
+const db = require('../config/DatabaseConfig')
 module.exports = class Database {
   constructor() {
     this.connect = connect
+    this.db = db
     this.params = {
       useNewUrlParser: true,
       useFindAndModify: false,
@@ -19,9 +20,9 @@ module.exports = class Database {
 
   ConnectDB() {
     console.info('Connecting to Database')
-    this.connect('mongodb://localhost:27017/kyra', this.params)
+    this.connect(this.db().connectionString, this.params)
     this.connection.once('open', () => {
-      console.info('Connected to database')
+      console.info(`Connected to database:  ${this.db().name}`)
     })
     return this.connection
   }

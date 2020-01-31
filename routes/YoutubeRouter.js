@@ -1,19 +1,28 @@
 const YoutubeRouter = require('express').Router()
-const FetchAllVideos = require('./YoutubeEndpoints')
-const pusher = require('../config/PusherConfig')
+const GetVideos = require('../middleware/GetVideos')
+const Subscribe = require('../middleware/Subscribe')
 const cron = require('node-cron')
+const { Video } = require('../db/Schema')
+const query = require('../queries/index')
 
-YoutubeRouter.post('/', async (req, res) => {
-  try {
-    FetchAllVideos().then(videos =>
-      pusher.trigger('subscribe', 'new-videos', {
-        message: 'connected',
-        data: videos
-      })
-    )
-  } catch (error) {
-    throw error
-  }
-})
+YoutubeRouter.post(
+  '/',
+  // GetVideos,
+  async (req, res, next) => {
+    try {
+      const { nextPageToken } = res.locals
+      const videos = await Video.find().limit(5)
+      console.log(videos.length)
+      res.locals = {
+        // nextPage: nextPageToken,
+        videos
+      }
+      next()
+    } catch (error) {
+      throw error
+    }
+  },
+  Subscribe
+)
 
 module.exports = YoutubeRouter

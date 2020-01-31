@@ -10,12 +10,12 @@ class Server {
     this.database = new Database()
   }
   get() {
-    this.app.get(this.baseroute, (req, res) => res.json({ msg: 'Portfolio' }))
+    this.app.get(this.baseroute, (req, res) => res.json({ msg: 'Kyra' }))
   }
 
   listen() {
     this.app.listen(this.port, () =>
-      console.info(`Server Started on  port:${this.port}`)
+      console.info(`Server Started on port: ${this.port}`)
     )
   }
 

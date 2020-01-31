@@ -6,7 +6,14 @@ module.exports = new Schema(
     publishDate: String,
     title: String,
     description: String,
-    thumbnail: String
+    thumbnail: String,
+    stats: {
+      viewCount: String,
+      likeCount: String,
+      dislikeCount: String,
+      favoriteCount: String,
+      commentCount: String
+    }
   },
   { timestamps: true }
 )

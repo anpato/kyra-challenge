@@ -28,10 +28,10 @@ export default class Wrapper extends Component<{}, AppState> {
       useTLS: true
     })
     const channel = pusher.subscribe('subscribe')
-    channel.bind('new-videos', (resp: any) =>
+    channel.bind('videos', (resp: any) =>
       this.setState({
-        channelInfo: resp.data.videos,
-        nextPage: resp.data.nextPageToken
+        channelInfo: resp.data.videos
+        // nextPage: resp.data.nextPage
       })
     )
   }
@@ -48,7 +48,7 @@ export default class Wrapper extends Component<{}, AppState> {
     if (this.state.channelInfo && this.state.channelInfo.length) {
       return this.state.channelInfo.map(video => {
         return (
-          <Card key={video.id}>
+          <Card key={video._id}>
             <div className="text-wrapper">
               <h3>{video.title}</h3>
             </div>

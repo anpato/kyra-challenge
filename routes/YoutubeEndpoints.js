@@ -14,7 +14,7 @@ const getData = async pageToken => {
         ''}`
     )
     const ids = await pullIds(resp.data.items)
-    return { nextPage: resp.data.nextPageToken, data: resp.data.items }
+    return { nextPage: resp.data.nextPageToken, ids }
   } catch (error) {
     throw error
   }
@@ -38,12 +38,12 @@ const pullIds = data => {
 const __ParseChannelVideos = channelData => {
   return channelData.map((data, index) => {
     const parsedData = {
-      id: data.id.videoId,
+      youtube_id: data.id,
       publishDate: data.snippet.publishedAt,
       title: data.snippet.title,
       description: data.snippet.description,
-      thumbnail: data.snippet.thumbnails.default.url
-      // stats: data.statistics
+      thumbnail: data.snippet.thumbnails.default.url,
+      stats: data.statistics
     }
     return parsedData
   })
@@ -51,10 +51,10 @@ const __ParseChannelVideos = channelData => {
 
 const FetchAllVideos = async () => {
   try {
-    const { data, nextPage } = await getData()
-    // const videos = await listVideos(ids)
+    const { ids, nextPage } = await getData()
+    const data = await listVideos(ids)
     const videos = __ParseChannelVideos(data)
-    return { nextPageToken: nextPage, videos }
+    return { nextPageToken: nextPage, data: videos }
   } catch (error) {
     throw error
   }
