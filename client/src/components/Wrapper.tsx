@@ -12,7 +12,10 @@ const {
 export default class Wrapper extends Component<{}, AppState> {
   state: AppState = {
     channelInfo: [],
-    nextPage: ''
+    targetedIndex: null,
+    nextPage: '',
+    stats: {},
+    isClosed: true
   }
 
   componentDidMount() {
@@ -44,9 +47,22 @@ export default class Wrapper extends Component<{}, AppState> {
     }
   }
 
+  getVideoStats = (index: number) => {
+    this.toggleOpen(false)
+    this.setState((state: AppState) => {
+      state.stats = state.channelInfo[index].stats
+      state.targetedIndex = index
+      return state
+    })
+  }
+
+  closeStats = () => {
+    this.setState({ targetedIndex: null, isClosed: true })
+  }
+
   renderVideos = () => {
     if (this.state.channelInfo && this.state.channelInfo.length) {
-      return this.state.channelInfo.map(video => {
+      return this.state.channelInfo.map((video, index) => {
         return (
           <Card key={video._id}>
             <div className="text-wrapper">
@@ -55,15 +71,56 @@ export default class Wrapper extends Component<{}, AppState> {
             <div className="image-wrapper">
               <img src={video.thumbnail} alt={video.title} />
             </div>
+            <button
+              onClick={() =>
+                this.state.targetedIndex === index
+                  ? this.closeStats()
+                  : this.getVideoStats(index)
+              }
+            >
+              {this.state.targetedIndex === index
+                ? 'Close Stats'
+                : 'View Stats'}
+            </button>
           </Card>
         )
       })
     }
   }
 
+  renderStats = () => {
+    if (Object.keys(this.state.stats).length) {
+      const { stats } = this.state
+      return (
+        <div className="stat-info">
+          <div className="box-wrapper">
+            <h3>Comments</h3>
+            <p>{stats.commentCount}</p>
+          </div>
+          <div className="box-wrapper">
+            <h3>Likes</h3>
+            <p>{stats.commentCount}</p>
+          </div>
+          <div className="box-wrapper">
+            <h3>Views</h3>
+            <p>{stats.viewCount}</p>
+          </div>
+        </div>
+      )
+    }
+  }
+
+  toggleOpen = (param: boolean) => this.setState({ isClosed: param })
+
   render() {
+    const { isClosed } = this.state
     return (
       <div className="wrapper">
+        <aside
+          className={isClosed ? `stat-wrapper closed` : `stat-wrapper open`}
+        >
+          {this.renderStats()}
+        </aside>
         <div className="card-wrapper">{this.renderVideos()}</div>
       </div>
     )

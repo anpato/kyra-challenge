@@ -12,33 +12,93 @@ code {
     monospace;
 }
 
-.card-wrapper {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-gap: 1.5em;
-  margin: Auto;
-  width: 80%;
-}
-
-.card {
+.wrapper {
   display: flex;
   flex-direction: column;
-  padding: 1em;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s;
-
-  .text-wrapper {
-    flex: 1;
-    text-align: center;
-  }
-  .image-wrapper {
-    flex: 1;
-  }
-
-  img {
+  height: 100%;
+  .stat-wrapper {
+    display: flex;
+    position: fixed;
+    height: 6em;
+    align-items: stretch;
     width: 100%;
+    background: #333;
+    color: #f8f8f8;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.6);
+    transition: all 0.3s ease;
+    .stat-info {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+    }
+    .box-wrapper {
+      width: 100%;
+      text-align: center;
+    }
   }
-  &:hover {
-    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.6);
+  .stat-wrapper.closed {
+    flex: 0;
+    width: 0;
+
+    .box-wrapper {
+      display: none;
+    }
   }
+
+  .stat-wrapper.open {
+    flex: 1;
+    .box-wrapper {
+      width: 100%;
+    }
+  }
+
+  .card-wrapper {
+    display: grid;
+    align-content: center;
+    justify-content: center;
+    grid-template-columns: repeat(auto-fill, 300px);
+    grid-gap: 1.5em;
+    margin: auto;
+    width: 80%;
+    flex: 3;
+    padding: 8em 2em 2em 2em;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s;
+    max-width: 300px;
+    border-radius: 4px;
+
+    .text-wrapper {
+      flex: 1;
+      text-align: center;
+    }
+    .image-wrapper {
+      flex: 1;
+    }
+
+    img {
+      width: 100%;
+    }
+    &:hover {
+      box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.6);
+    }
+  }
+}
+
+button {
+  cursor: pointer;
+  padding: 0.6em 1.2em;
+  width: 120px;
+  margin: auto;
+  font-size: 0.9rem;
+  background-color: #ab47bc;
+  color: #f8f8f8;
+  border: none;
+  border-radius: 4px;
+  outline: none;
 }
