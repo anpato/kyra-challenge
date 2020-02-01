@@ -4,6 +4,7 @@ import { subscribeToFeed, LoadVideos, GetWeeklyUploadStats } from '../services'
 import Pusher from 'pusher-js'
 import { Card } from './shared'
 import { VideoChart } from './shared/Chart'
+import Loader from 'react-loader-spinner'
 const {
   REACT_APP_PUSHER_ID,
   REACT_APP_PUSHER_KEY,
@@ -19,10 +20,14 @@ export default class Wrapper extends Component<{}, AppState> {
     isClosed: true,
     currentPage: 1,
     maxPage: 0,
-    uploadData: {}
+    uploadData: {},
+    isLoading: true,
+    loadingMessage: '',
+    closeMessage: false
   }
 
   componentDidMount() {
+    this.setState({ loadingMessage: 'Connecting' })
     this.fetchVideos()
     this.fetchWeeklyUploads()
     this.createPusher()
@@ -36,20 +41,25 @@ export default class Wrapper extends Component<{}, AppState> {
       useTLS: true
     })
     const channel = pusher.subscribe('subscribe')
-    channel.bind(
-      'videos',
-      (resp: any) => console.log(resp)
-      // this.setState({
-      //   channelInfo: resp.data.videos
-      //   // nextPage: resp.data.nextPage
-      // })
-    )
+    channel.bind('videos', (resp: any) => {
+      const keys = Object.keys(resp.data)
+      switch (true) {
+        case keys.includes('video'):
+          this.setState(state => ({
+            channelInfo: [resp.data.video, ...state.channelInfo]
+          }))
+        case keys.includes('uploads'):
+          this.setState(state => ({
+            uploadData: resp.data.uploads
+          }))
+      }
+    })
   }
 
   fetchWeeklyUploads = async () => {
     try {
       const uploadData = await GetWeeklyUploadStats()
-      this.setState({ uploadData })
+      this.setState({ uploadData, isLoading: false })
     } catch (error) {
       throw error
     }
@@ -167,21 +177,38 @@ export default class Wrapper extends Component<{}, AppState> {
 
   toggleOpen = (param: boolean) => this.setState({ isClosed: param })
 
-  render() {
+  renderPage = () => {
     const { isClosed } = this.state
-    return (
-      <div className="wrapper">
-        {Object.keys(this.state.uploadData).length ? (
-          <VideoChart chartData={this.state.uploadData} />
-        ) : null}
-        <aside
-          className={isClosed ? `stat-wrapper closed` : `stat-wrapper open`}
-        >
-          {this.renderStats()}
-        </aside>
-        {this.displayButton()}
-        <div className="card-wrapper">{this.renderVideos()}</div>
-      </div>
-    )
+    if (!this.state.isLoading) {
+      return (
+        <div className="wrapper">
+          <div className="chart-wrapper">
+            {Object.keys(this.state.uploadData).length ? (
+              <VideoChart chartData={this.state.uploadData} />
+            ) : null}
+          </div>
+          <section
+            className={isClosed ? `stat-wrapper closed` : `stat-wrapper open`}
+          >
+            {this.renderStats()}
+          </section>
+          {this.displayButton()}
+          <div className="card-wrapper">{this.renderVideos()}</div>
+        </div>
+      )
+    } else {
+      return (
+        <div className="tmp-wrapper">
+          <div>
+            <Loader type="Grid" color="#00BFFF" height={100} width={100} />
+            <h3>Loading Kyra</h3>
+          </div>
+        </div>
+      )
+    }
+  }
+
+  render() {
+    return this.renderPage()
   }
 }

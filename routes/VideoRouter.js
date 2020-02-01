@@ -1,6 +1,7 @@
 const VideoRouter = require('express').Router()
 const { Video } = require('../db/Schema')
 const DateRanges = require('../middleware/DateRanges')
+const CountUploads = require('../middleware/CountUploads')
 
 VideoRouter.get('/', async (req, res) => {
   try {
@@ -21,30 +22,9 @@ VideoRouter.get('/', async (req, res) => {
   }
 })
 
-VideoRouter.get('/uploads', DateRanges, async (req, res) => {
+VideoRouter.get('/uploads', DateRanges, CountUploads, async (req, res) => {
   try {
-    const { weekRanges } = res.locals
-    let uploads = {
-      labels: ['Dates', 'Uploads'],
-      data: []
-    }
-    await weekRanges.reduce(async (promise, week) => {
-      await Video.find({
-        publishDate: {
-          $gte: week.start,
-          $lt: week.end
-        }
-      }).countDocuments((err, count) => {
-        let start = week.start.toLocaleString().split(',')[0]
-        let end = week.end.toLocaleString().split(',')[0]
-
-        uploads['data'].push(
-          Object.values({ dates: `${start}-${end}`, uploads: count })
-        )
-      })
-      return promise
-    }, Promise.resolve())
-    res.send(uploads)
+    res.send(res.locals.uploads)
   } catch (error) {
     throw error
   }

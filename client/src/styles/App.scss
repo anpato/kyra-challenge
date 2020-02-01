@@ -16,10 +16,14 @@ code {
   display: flex;
   flex-direction: column;
   height: 100%;
+  .chart-wrapper {
+    width: 80%;
+    margin: auto;
+  }
   .stat-wrapper {
     display: flex;
     position: fixed;
-    height: 6em;
+    height: 8em;
     align-items: stretch;
     width: 100%;
     background: #333;
@@ -61,7 +65,7 @@ code {
     margin: auto;
     width: 80%;
     flex: 3;
-    padding: 8em 2em 2em 2em;
+    padding: 4em 2em 2em 2em;
   }
 
   .card {
@@ -126,5 +130,15 @@ button {
   color: #333;
   &:hover {
     opacity: 0.4;
+  }
+}
+
+.tmp-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  h3 {
+    text-align: center;
   }
 }

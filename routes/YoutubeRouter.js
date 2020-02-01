@@ -1,7 +1,8 @@
 const YoutubeRouter = require('express').Router()
 const Subscribe = require('../middleware/Subscribe')
 const WatchCollection = require('../middleware/WatchCollection')
-
-YoutubeRouter.get('/', WatchCollection, Subscribe)
+const DateRanges = require('../middleware/DateRanges')
+const CountUploads = require('../middleware/CountUploads')
+YoutubeRouter.get('/', WatchCollection, DateRanges, CountUploads, Subscribe)
 
 module.exports = YoutubeRouter

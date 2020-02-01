@@ -7,6 +7,9 @@ export interface AppState {
   currentPage: number
   maxPage: number
   uploadData: any
+  isLoading: boolean
+  loadingMessage: string
+  closeMessage: boolean
 }
 
 export interface CardProps {
