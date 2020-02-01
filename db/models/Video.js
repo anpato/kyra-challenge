@@ -1,8 +1,12 @@
 const Schema = require('mongoose').Schema
-
-module.exports = new Schema(
+var uniqueValidator = require('mongoose-unique-validator')
+const Video = new Schema(
   {
-    youtube_id: String,
+    youtube_id: {
+      type: String,
+      unique: true,
+      index: true
+    },
     publishDate: String,
     title: String,
     description: String,
@@ -17,3 +21,6 @@ module.exports = new Schema(
   },
   { timestamps: true }
 )
+Video.plugin(uniqueValidator)
+
+module.exports = Video

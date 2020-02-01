@@ -10,9 +10,10 @@ const Api = Axios.create({
 const getData = async pageToken => {
   try {
     const resp = await Api.get(
-      `/search?key=${token}&channelId=UCvO6uJUVJQ6SrATfsWR5_aA&part=snippet,id&order=date&maxResults=20&pageToken=${pageToken ||
+      `/search?key=${token}&channelId=UCvO6uJUVJQ6SrATfsWR5_aA&part=snippet,id&order=date&maxResults=50&pageToken=${pageToken ||
         ''}`
     )
+    // console.log(resp.data.items)
     const ids = await pullIds(resp.data.items)
     return { nextPage: resp.data.nextPageToken, ids }
   } catch (error) {

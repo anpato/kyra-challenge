@@ -4,6 +4,8 @@ export interface AppState {
   stats: any
   isClosed: boolean
   targetedIndex: number | null
+  currentPage: number
+  maxPage: number
 }
 
 export interface CardProps {

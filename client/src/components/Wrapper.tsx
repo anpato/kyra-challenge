@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { AppState } from '../types'
-import { subscribeToFeed } from '../services'
+import { subscribeToFeed, LoadMoreVideos } from '../services'
 import Pusher from 'pusher-js'
 import { Card } from './shared'
 const {
@@ -15,7 +15,9 @@ export default class Wrapper extends Component<{}, AppState> {
     targetedIndex: null,
     nextPage: '',
     stats: {},
-    isClosed: true
+    isClosed: true,
+    currentPage: 1,
+    maxPage: 0
   }
 
   componentDidMount() {
@@ -45,6 +47,24 @@ export default class Wrapper extends Component<{}, AppState> {
     } catch (error) {
       throw error
     }
+  }
+
+  loadAdditionalVideos = () => {
+    if (this.state.currentPage !== this.state.maxPage)
+      this.setState(
+        (state: AppState) => ({ currentPage: state.currentPage + 1 }),
+        async () => {
+          try {
+            const additionalVideos = await LoadMoreVideos(
+              this.state.currentPage
+            )
+            this.setState((state: AppState) => ({
+              channelInfo: [...additionalVideos.data, ...state.channelInfo],
+              maxPage: additionalVideos.pages
+            }))
+          } catch (error) {}
+        }
+      )
   }
 
   getVideoStats = (index: number) => {
@@ -110,6 +130,23 @@ export default class Wrapper extends Component<{}, AppState> {
     }
   }
 
+  displayButton = () => {
+    const { maxPage, currentPage } = this.state
+    if (maxPage === currentPage) {
+      return (
+        <button className="icon danger">
+          <p> No Videos</p>
+        </button>
+      )
+    } else {
+      return (
+        <button className="icon" onClick={this.loadAdditionalVideos}>
+          <p>Load More</p>
+        </button>
+      )
+    }
+  }
+
   toggleOpen = (param: boolean) => this.setState({ isClosed: param })
 
   render() {
@@ -121,6 +158,7 @@ export default class Wrapper extends Component<{}, AppState> {
         >
           {this.renderStats()}
         </aside>
+        {this.displayButton()}
         <div className="card-wrapper">{this.renderVideos()}</div>
       </div>
     )

@@ -1,6 +1,8 @@
 const express = require('express')
 const Router = require('./routes')
 const Database = require('./db/Database')
+const GetVideos = require('./middleware/GetVideos')
+const cron = require('node-cron')
 class Server {
   constructor(port, middleWare, baseroute) {
     this.app = express()
@@ -19,6 +21,13 @@ class Server {
     )
   }
 
+  startCron() {
+    cron.schedule('*/30 * * * *', async () => {
+      console.log('firing')
+      // await GetVideos()
+    })
+  }
+
   init_middleWare() {
     this.middleWare.forEach(middleware => this.app.use(middleware))
   }
@@ -28,6 +37,7 @@ class Server {
   connectDB() {
     this.database.ConnectDB().once('open', () => {
       this.listen()
+      this.startCron()
     })
   }
   initialize() {
