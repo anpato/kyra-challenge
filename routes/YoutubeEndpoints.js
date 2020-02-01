@@ -13,9 +13,13 @@ const getData = async pageToken => {
       `/search?key=${token}&channelId=UCvO6uJUVJQ6SrATfsWR5_aA&part=snippet,id&order=date&maxResults=50&pageToken=${pageToken ||
         ''}`
     )
-    // console.log(resp.data.items)
+    // console.log(resp.data)
     const ids = await pullIds(resp.data.items)
-    return { nextPage: resp.data.nextPageToken, ids }
+    return {
+      nextPage: resp.data.nextPageToken,
+      ids,
+      totalResults: resp.data.pageInfo.totalResults
+    }
   } catch (error) {
     throw error
   }
@@ -50,12 +54,12 @@ const __ParseChannelVideos = channelData => {
   })
 }
 
-const FetchAllVideos = async () => {
+const FetchAllVideos = async token => {
   try {
-    const { ids, nextPage } = await getData()
+    const { ids, nextPage, totalResults } = await getData(token)
     const data = await listVideos(ids)
     const videos = __ParseChannelVideos(data)
-    return { nextPageToken: nextPage, data: videos }
+    return { nextPageToken: nextPage, data: videos, totalResults }
   } catch (error) {
     throw error
   }

@@ -2,8 +2,7 @@ const FetchAllVideos = require('../routes/YoutubeEndpoints')
 const { Video } = require('../db/Schema')
 
 module.exports = async () => {
-  const { data, nextPageToken } = await FetchAllVideos()
-
+  const { data, nextPageToken, totalResults } = await FetchAllVideos()
   await Video.insertMany(data, {
     ordered: false,
     runVaildators: true,

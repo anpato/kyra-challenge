@@ -21,11 +21,12 @@ class Server {
     )
   }
 
-  startCron() {
-    cron.schedule('* * * * *', async () => {
-      console.log('firing')
-      // await GetVideos()
-    })
+  async startCron() {
+    await GetVideos()
+    // cron.schedule('* * * * *', async () => {
+    //   console.log('firing')
+
+    // })
   }
 
   init_middleWare() {
