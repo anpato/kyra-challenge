@@ -1,9 +1,9 @@
 const pusher = require('../config/PusherConfig')
 
 module.exports = async (req, res) => {
-  const { videos, nextPage } = res.locals
+  const { video } = res.locals
   await pusher.trigger('subscribe', 'videos', {
     message: 'connected',
-    data: { videos }
+    data: { video }
   })
 }

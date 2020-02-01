@@ -2,7 +2,7 @@ import { Api } from '../config'
 
 export const subscribeToFeed = async () => {
   try {
-    const resp = await Api.post('/live')
+    const resp = await Api.get('/live')
     console.log(resp)
     return resp.data
   } catch (error) {
@@ -10,7 +10,7 @@ export const subscribeToFeed = async () => {
   }
 }
 
-export const LoadMoreVideos = async (page: number) => {
+export const LoadVideos = async (page: number) => {
   try {
     const resp = await Api.get(`/videos/?page=${page}`)
     return resp.data

@@ -5,14 +5,14 @@ VideoRouter.get('/', async (req, res) => {
   try {
     const perPage = 10,
       page = Math.max(0, parseInt(req.query.page))
-    Video.find({}, null, { sort: '-publishDate' })
+    await Video.find({}, null, { sort: '-publishDate' })
       .limit(perPage)
       .skip(perPage * page)
       .exec((err, data) => {
         if (err) throw err
         Video.countDocuments().exec((err, count) => {
           if (err) throw err
-          res.send({ data, page, pages: Math.ceil(count / perPage) })
+          res.send({ data, page, pages: Math.floor(count / perPage) })
         })
       })
   } catch (error) {

@@ -22,7 +22,7 @@ class Server {
   }
 
   startCron() {
-    cron.schedule('*/30 * * * *', async () => {
+    cron.schedule('* * * * *', async () => {
       console.log('firing')
       // await GetVideos()
     })

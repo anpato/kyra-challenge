@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { AppState } from '../types'
-import { subscribeToFeed, LoadMoreVideos } from '../services'
+import { subscribeToFeed, LoadVideos } from '../services'
 import Pusher from 'pusher-js'
 import { Card } from './shared'
 const {
@@ -33,16 +33,24 @@ export default class Wrapper extends Component<{}, AppState> {
       useTLS: true
     })
     const channel = pusher.subscribe('subscribe')
-    channel.bind('videos', (resp: any) =>
-      this.setState({
-        channelInfo: resp.data.videos
-        // nextPage: resp.data.nextPage
-      })
+    channel.bind(
+      'videos',
+      (resp: any) => console.log(resp)
+      // this.setState({
+      //   channelInfo: resp.data.videos
+      //   // nextPage: resp.data.nextPage
+      // })
     )
   }
 
   fetchVideos = async () => {
     try {
+      const channelInfo = await LoadVideos(this.state.currentPage)
+
+      this.setState(state => ({
+        channelInfo: channelInfo.data,
+        maxPage: channelInfo.pages
+      }))
       await subscribeToFeed()
     } catch (error) {
       throw error
@@ -55,9 +63,7 @@ export default class Wrapper extends Component<{}, AppState> {
         (state: AppState) => ({ currentPage: state.currentPage + 1 }),
         async () => {
           try {
-            const additionalVideos = await LoadMoreVideos(
-              this.state.currentPage
-            )
+            const additionalVideos = await LoadVideos(this.state.currentPage)
             this.setState((state: AppState) => ({
               channelInfo: [...additionalVideos.data, ...state.channelInfo],
               maxPage: additionalVideos.pages
@@ -81,7 +87,7 @@ export default class Wrapper extends Component<{}, AppState> {
   }
 
   renderVideos = () => {
-    if (this.state.channelInfo && this.state.channelInfo.length) {
+    if (this.state.channelInfo.length) {
       return this.state.channelInfo.map((video, index) => {
         return (
           <Card key={video._id}>
