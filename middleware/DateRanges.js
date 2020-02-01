@@ -7,10 +7,6 @@ module.exports = (req, res, next) => {
 
   const weeks = CreateWeekRanges(maxRange, today)
   res.locals = {
-    dateRanges: {
-      currentDate: today._d,
-      startDate: maxRange._d
-    },
     weekRanges: weeks
   }
   next()
