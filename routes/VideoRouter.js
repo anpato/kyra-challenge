@@ -24,7 +24,10 @@ VideoRouter.get('/', async (req, res) => {
 VideoRouter.get('/uploads', DateRanges, async (req, res) => {
   try {
     const { weekRanges } = res.locals
-    let uploads = []
+    let uploads = {
+      labels: ['Dates', 'Uploads'],
+      data: []
+    }
     await weekRanges.reduce(async (promise, week) => {
       await Video.find({
         publishDate: {
@@ -32,7 +35,12 @@ VideoRouter.get('/uploads', DateRanges, async (req, res) => {
           $lt: week.end
         }
       }).countDocuments((err, count) => {
-        uploads.push({ ...week, uploads: count })
+        let start = week.start.toLocaleString().split(',')[0]
+        let end = week.end.toLocaleString().split(',')[0]
+
+        uploads['data'].push(
+          Object.values({ dates: `${start}-${end}`, uploads: count })
+        )
       })
       return promise
     }, Promise.resolve())

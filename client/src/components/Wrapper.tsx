@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { AppState } from '../types'
-import { subscribeToFeed, LoadVideos } from '../services'
+import { subscribeToFeed, LoadVideos, GetWeeklyUploadStats } from '../services'
 import Pusher from 'pusher-js'
 import { Card } from './shared'
+import { VideoChart } from './shared/Chart'
 const {
   REACT_APP_PUSHER_ID,
   REACT_APP_PUSHER_KEY,
@@ -17,11 +18,13 @@ export default class Wrapper extends Component<{}, AppState> {
     stats: {},
     isClosed: true,
     currentPage: 1,
-    maxPage: 0
+    maxPage: 0,
+    uploadData: {}
   }
 
   componentDidMount() {
     this.fetchVideos()
+    this.fetchWeeklyUploads()
     this.createPusher()
   }
 
@@ -41,6 +44,15 @@ export default class Wrapper extends Component<{}, AppState> {
       //   // nextPage: resp.data.nextPage
       // })
     )
+  }
+
+  fetchWeeklyUploads = async () => {
+    try {
+      const uploadData = await GetWeeklyUploadStats()
+      this.setState({ uploadData })
+    } catch (error) {
+      throw error
+    }
   }
 
   fetchVideos = async () => {
@@ -159,6 +171,9 @@ export default class Wrapper extends Component<{}, AppState> {
     const { isClosed } = this.state
     return (
       <div className="wrapper">
+        {Object.keys(this.state.uploadData).length ? (
+          <VideoChart chartData={this.state.uploadData} />
+        ) : null}
         <aside
           className={isClosed ? `stat-wrapper closed` : `stat-wrapper open`}
         >

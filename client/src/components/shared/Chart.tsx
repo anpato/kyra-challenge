@@ -1,13 +1,23 @@
 import React, { useMemo } from 'react'
-import { Chart } from 'react-charts'
+import { Chart } from 'react-google-charts'
 import { ChartProps } from '../../types'
+
 export const VideoChart = (props: ChartProps) => {
-  const axes = React.useMemo(
-    () => [
-      { primary: true, type: 'linear', position: 'bottom' },
-      { type: 'linear', position: 'left' }
-    ],
-    []
+  console.log(props.chartData)
+  return (
+    <Chart
+      chartType="ColumnChart"
+      data={[props.chartData.labels, ...props.chartData.data]}
+      options={{
+        chartArea: { widht: '50%' },
+        hAxis: {
+          title: 'Dates'
+        },
+        vAxis: {
+          title: 'Uploads',
+          minValue: 0
+        }
+      }}
+    />
   )
-  return <Chart axes={axes} />
 }

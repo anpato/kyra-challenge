@@ -6,6 +6,7 @@ export interface AppState {
   targetedIndex: number | null
   currentPage: number
   maxPage: number
+  uploadData: any
 }
 
 export interface CardProps {
@@ -13,5 +14,10 @@ export interface CardProps {
 }
 
 export interface ChartProps {
-  chartData: any[]
+  chartData: ChartData
+}
+
+export interface ChartData {
+  labels: string[]
+  data: any[]
 }
