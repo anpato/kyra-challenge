@@ -10,5 +10,8 @@ export interface AppState {
 
 export interface CardProps {
   children: React.ReactElement[]
-  // onClick: (event: React.MouseEvent<HTMLElement>) => void
+}
+
+export interface ChartProps {
+  chartData: any[]
 }

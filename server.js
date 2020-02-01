@@ -3,6 +3,7 @@ const Router = require('./routes')
 const Database = require('./db/Database')
 const GetVideos = require('./middleware/GetVideos')
 const cron = require('node-cron')
+const dateFilter = require('./middleware/DateRanges')
 class Server {
   constructor(port, middleWare, baseroute) {
     this.app = express()
@@ -22,10 +23,10 @@ class Server {
   }
 
   async startCron() {
-    await GetVideos()
+    // dateFilter()
+    // await GetVideos()
     // cron.schedule('* * * * *', async () => {
     //   console.log('firing')
-
     // })
   }
 

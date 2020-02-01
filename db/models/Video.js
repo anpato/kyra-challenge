@@ -7,7 +7,7 @@ const Video = new Schema(
       unique: true,
       index: true
     },
-    publishDate: String,
+    publishDate: Date,
     title: String,
     description: String,
     thumbnail: String,
