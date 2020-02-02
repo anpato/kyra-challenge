@@ -2,8 +2,8 @@
 
 ### Setup
 
-- npm install or install
-- cd client directory and npm install or yarn install
+- `npm install` or `yarn install`
+- `cd client` directory and `npm install` or `yarn install`
 - You'll need the url for the cloud hosted database in order to start the server successfully, I can provide credentials for this.
 
 ### Dependencies
