@@ -37,7 +37,7 @@ export default class Wrapper extends Component<{}, AppState> {
       switch (true) {
         case keys.includes('video'):
           this.setState(state => ({
-            channelInfo: [res.data.video, ...state.channelInfo]
+            channelInfo: [...res.data.video, ...state.channelInfo]
           }))
         case keys.includes('uploads'):
           this.setState(state => ({
