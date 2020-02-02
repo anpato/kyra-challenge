@@ -1,8 +1,6 @@
 const Router = require('express').Router()
-const YoutubeRouter = require('./YoutubeRouter')
 const VideoRouter = require('./VideoRouter')
-
-Router.use('/live', YoutubeRouter)
+const SubscriptionRouter = require('./SubscriptionRouter')
 Router.use('/videos', VideoRouter)
-
+Router.use('/live', SubscriptionRouter)
 module.exports = Router

@@ -9,7 +9,7 @@ export const VideoChart = (props: ChartProps) => {
       data={[props.chartData.labels, ...props.chartData.data]}
       options={{
         chartArea: {
-          width: '80%'
+          width: '70%'
         },
         animation: {
           duration: 1500,

@@ -8,8 +8,7 @@ export interface AppState {
   maxPage: number
   uploadData: any
   isLoading: boolean
-  loadingMessage: string
-  closeMessage: boolean
+  additionalLoading: boolean
 }
 
 export interface CardProps {

@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
 import { AppState } from '../types'
-import { subscribeToFeed, LoadVideos, GetWeeklyUploadStats } from '../services'
+import { SubscribeToFeed, LoadVideos, GetWeeklyUploadStats } from '../services'
 import { Card, VideoChart, StatChart } from './shared'
 import Loader from 'react-loader-spinner'
 import { pusher } from '../config/PusherConfig'
-
 export default class Wrapper extends Component<{}, AppState> {
   state: AppState = {
     channelInfo: [],
@@ -16,12 +15,10 @@ export default class Wrapper extends Component<{}, AppState> {
     maxPage: 0,
     uploadData: {},
     isLoading: true,
-    loadingMessage: 'Connecting',
-    closeMessage: false
+    additionalLoading: false
   }
 
   componentDidMount() {
-    this.setState({ loadingMessage: 'Connecting' })
     this.fetchVideos()
     this.fetchWeeklyUploads()
     this.createPusher()
@@ -54,7 +51,7 @@ export default class Wrapper extends Component<{}, AppState> {
     try {
       const uploadData = await GetWeeklyUploadStats()
       this.setState({ uploadData, isLoading: false })
-      await subscribeToFeed()
+      await SubscribeToFeed()
     } catch (error) {
       throw error
     }
@@ -74,6 +71,7 @@ export default class Wrapper extends Component<{}, AppState> {
   }
 
   loadAdditionalVideos = () => {
+    this.setState({ additionalLoading: true })
     if (this.state.currentPage !== this.state.maxPage)
       this.setState(
         (state: AppState) => ({ currentPage: state.currentPage + 1 }),
@@ -82,7 +80,8 @@ export default class Wrapper extends Component<{}, AppState> {
             const additionalVideos = await LoadVideos(this.state.currentPage)
             this.setState((state: AppState) => ({
               channelInfo: [...additionalVideos.data, ...state.channelInfo],
-              maxPage: additionalVideos.pages
+              maxPage: additionalVideos.pages,
+              additionalLoading: false
             }))
           } catch (error) {}
         }
@@ -115,19 +114,25 @@ export default class Wrapper extends Component<{}, AppState> {
     if (this.state.stats) {
       const { stats } = this.state
       return <StatChart chartData={stats} />
+    } else if (!this.state.stats && this.state.targetedIndex) {
+      return <h2>No Stats To Display</h2>
     }
     return <h2>Select A Video To View Statistics</h2>
   }
 
   displayButton = () => {
-    const { maxPage, currentPage } = this.state
+    const { maxPage, currentPage, additionalLoading } = this.state
     return maxPage === currentPage ? (
       <button className="icon danger">
         <p> No Videos</p>
       </button>
     ) : (
       <button className="icon" onClick={this.loadAdditionalVideos}>
-        <p>Load More</p>
+        {additionalLoading ? (
+          <Loader type="TailSpin" color="#333" height={40} width={40} />
+        ) : (
+          <p>Load More</p>
+        )}
       </button>
     )
   }
@@ -145,9 +150,9 @@ export default class Wrapper extends Component<{}, AppState> {
             </div>
             <div className="chart">{this.renderStats()}</div>
           </div>
-
           <div className="card-wrapper">
             {this.displayButton()}
+
             {this.renderVideos()}
           </div>
         </div>

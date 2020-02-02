@@ -1,6 +1,6 @@
 import { Api } from '../config'
 
-export const subscribeToFeed = async () => {
+export const SubscribeToFeed = async () => {
   try {
     const resp = await Api.get('/live')
     return resp.data
