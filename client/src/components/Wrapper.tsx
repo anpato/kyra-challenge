@@ -1,16 +1,11 @@
 import React, { Component } from 'react'
 import { AppState } from '../types'
 import { subscribeToFeed, LoadVideos, GetWeeklyUploadStats } from '../services'
-import Pusher from 'pusher-js'
 import { Card } from './shared'
 import { VideoChart } from './shared/Chart'
 import Loader from 'react-loader-spinner'
-const {
-  REACT_APP_PUSHER_ID,
-  REACT_APP_PUSHER_KEY,
-  REACT_APP_PUSHER_SECRET,
-  REACT_APP_PUSHER_CLUSTER
-} = process.env
+import { pusher } from '../config/PusherConfig'
+
 export default class Wrapper extends Component<{}, AppState> {
   state: AppState = {
     channelInfo: [],
@@ -22,7 +17,7 @@ export default class Wrapper extends Component<{}, AppState> {
     maxPage: 0,
     uploadData: {},
     isLoading: true,
-    loadingMessage: '',
+    loadingMessage: 'Connecting',
     closeMessage: false
   }
 
@@ -34,32 +29,34 @@ export default class Wrapper extends Component<{}, AppState> {
   }
 
   createPusher = () => {
-    const pusher = new Pusher(REACT_APP_PUSHER_KEY, {
-      appId: REACT_APP_PUSHER_ID,
-      secret: REACT_APP_PUSHER_SECRET,
-      cluster: REACT_APP_PUSHER_CLUSTER,
-      useTLS: true
-    })
     const channel = pusher.subscribe('subscribe')
     channel.bind('videos', (resp: any) => {
-      const keys = Object.keys(resp.data)
+      this.setSubscriptions(resp)
+    })
+    this.setState({ isLoading: false })
+  }
+
+  setSubscriptions = (res: any) => {
+    if (res?.data) {
+      console.log(res)
+      const keys = Object.keys(res.data)
       switch (true) {
         case keys.includes('video'):
           this.setState(state => ({
-            channelInfo: [resp.data.video, ...state.channelInfo]
+            channelInfo: [res.data.video, ...state.channelInfo]
           }))
         case keys.includes('uploads'):
           this.setState(state => ({
-            uploadData: resp.data.uploads
+            uploadData: res.data.uploads
           }))
       }
-    })
+    }
   }
 
   fetchWeeklyUploads = async () => {
     try {
       const uploadData = await GetWeeklyUploadStats()
-      this.setState({ uploadData, isLoading: false })
+      this.setState({ uploadData })
     } catch (error) {
       throw error
     }
