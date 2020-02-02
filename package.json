@@ -5,6 +5,8 @@
   "author": "Andre Pato <anpato1994@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "heroku-postbuild": "yarn install && cd client && yarn install && yarn build",
+    "start": "node app.js",
     "dev": "nodemon app.js"
   },
   "dependencies": {

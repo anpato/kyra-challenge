@@ -3,7 +3,9 @@ const Router = require('./routes')
 const Database = require('./db/Database')
 const GetVideos = require('./middleware/GetVideos')
 const cron = require('node-cron')
-
+const path = require('path')
+const dotenv = require('dotenv')
+dotenv.config()
 class Server {
   constructor(port, middleWare, baseroute) {
     this.app = express()
@@ -13,7 +15,13 @@ class Server {
     this.database = new Database()
   }
   get() {
-    this.app.get(this.baseroute, (req, res) => res.json({ msg: 'Kyra' }))
+    if (process.env.NODE_ENV === 'production') {
+      App.get('*', (req, res) =>
+        res.sendFile(path.join(__dirname, './client/build', 'index.html'))
+      )
+    } else {
+      this.app.get(this.baseroute, (req, res) => res.json({ msg: 'Kyra' }))
+    }
   }
 
   listen() {
@@ -34,6 +42,11 @@ class Server {
   init_routes() {
     this.app.use('/api', Router)
   }
+
+  setupClientJoin() {
+    this.app.use(express.static(path.join(__dirname, '../client/build')))
+  }
+
   connectDB() {
     this.database.ConnectDB().once('open', () => {
       this.listen()
@@ -44,6 +57,8 @@ class Server {
     this.app.disable('x-powered-by')
     this.init_middleWare()
     this.init_routes()
+    this.setupClientJoin()
+    this.get()
     this.connectDB()
   }
 }
