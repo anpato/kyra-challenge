@@ -16,8 +16,8 @@ class Server {
   }
   get() {
     if (process.env.NODE_ENV === 'production') {
-      this.app.get('*', (req, res) =>
-        res.sendFile(path.join(__dirname, './client/build', 'index.html'))
+      return this.app.get('*', (req, res) =>
+        res.sendFile(path.join(__dirname, '/client/build', 'index.html'))
       )
     } else {
       this.app.get(this.baseroute, (req, res) => res.json({ msg: 'Kyra' }))
@@ -44,7 +44,7 @@ class Server {
   }
 
   setupClientJoin() {
-    this.app.use(express.static(path.join(__dirname, '../client/build')))
+    this.app.use(express.static(path.join(__dirname, '/client/build')))
   }
 
   connectDB() {
@@ -55,9 +55,10 @@ class Server {
   }
   initialize() {
     this.app.disable('x-powered-by')
+    this.setupClientJoin()
     this.init_middleWare()
     this.init_routes()
-    this.setupClientJoin()
+
     this.get()
     this.connectDB()
   }
