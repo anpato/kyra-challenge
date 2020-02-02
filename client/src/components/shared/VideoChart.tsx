@@ -1,13 +1,21 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { Chart } from 'react-google-charts'
 import { ChartProps } from '../../types'
 
 export const VideoChart = (props: ChartProps) => {
   return (
     <Chart
-      chartType="ColumnChart"
+      chartType="Bar"
       data={[props.chartData.labels, ...props.chartData.data]}
       options={{
+        chartArea: {
+          width: '80%'
+        },
+        animation: {
+          duration: 1500,
+          easing: 'out',
+          startup: true
+        },
         hAxis: {
           title: 'Dates'
         },

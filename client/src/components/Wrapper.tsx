@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import { AppState } from '../types'
 import { subscribeToFeed, LoadVideos, GetWeeklyUploadStats } from '../services'
-import { Card } from './shared'
-import { VideoChart } from './shared/Chart'
+import { Card, VideoChart, StatChart } from './shared'
 import Loader from 'react-loader-spinner'
 import { pusher } from '../config/PusherConfig'
 
@@ -11,7 +10,7 @@ export default class Wrapper extends Component<{}, AppState> {
     channelInfo: [],
     targetedIndex: null,
     nextPage: '',
-    stats: {},
+    stats: null,
     isClosed: true,
     currentPage: 1,
     maxPage: 0,
@@ -33,12 +32,10 @@ export default class Wrapper extends Component<{}, AppState> {
     channel.bind('videos', (resp: any) => {
       this.setSubscriptions(resp)
     })
-    this.setState({ isLoading: false })
   }
 
   setSubscriptions = (res: any) => {
     if (res?.data) {
-      console.log(res)
       const keys = Object.keys(res.data)
       switch (true) {
         case keys.includes('video'):
@@ -56,7 +53,8 @@ export default class Wrapper extends Component<{}, AppState> {
   fetchWeeklyUploads = async () => {
     try {
       const uploadData = await GetWeeklyUploadStats()
-      this.setState({ uploadData })
+      this.setState({ uploadData, isLoading: false })
+      await subscribeToFeed()
     } catch (error) {
       throw error
     }
@@ -70,7 +68,6 @@ export default class Wrapper extends Component<{}, AppState> {
         channelInfo: channelInfo.data,
         maxPage: channelInfo.pages
       }))
-      await subscribeToFeed()
     } catch (error) {
       throw error
     }
@@ -102,74 +99,37 @@ export default class Wrapper extends Component<{}, AppState> {
   }
 
   closeStats = () => {
-    this.setState({ targetedIndex: null, isClosed: true })
+    this.setState({ targetedIndex: null, isClosed: true, stats: null })
   }
 
-  renderVideos = () => {
-    if (this.state.channelInfo.length) {
-      return this.state.channelInfo.map((video, index) => {
-        return (
-          <Card key={video._id}>
-            <div className="text-wrapper">
-              <h3>{video.title}</h3>
-            </div>
-            <div className="image-wrapper">
-              <img src={video.thumbnail} alt={video.title} />
-            </div>
-            <button
-              onClick={() =>
-                this.state.targetedIndex === index
-                  ? this.closeStats()
-                  : this.getVideoStats(index)
-              }
-            >
-              {this.state.targetedIndex === index
-                ? 'Close Stats'
-                : 'View Stats'}
-            </button>
-          </Card>
-        )
-      })
-    }
-  }
+  renderVideos = () => (
+    <Card
+      videos={this.state.channelInfo}
+      displayStats={this.getVideoStats}
+      clearStats={this.closeStats}
+      selectedIndex={this.state.targetedIndex}
+    />
+  )
 
   renderStats = () => {
-    if (Object.keys(this.state.stats).length) {
+    if (this.state.stats) {
       const { stats } = this.state
-      return (
-        <div className="stat-info">
-          <div className="box-wrapper">
-            <h3>Comments</h3>
-            <p>{stats.commentCount}</p>
-          </div>
-          <div className="box-wrapper">
-            <h3>Likes</h3>
-            <p>{stats.commentCount}</p>
-          </div>
-          <div className="box-wrapper">
-            <h3>Views</h3>
-            <p>{stats.viewCount}</p>
-          </div>
-        </div>
-      )
+      return <StatChart chartData={stats} />
     }
+    return <h2>Select A Video To View Statistics</h2>
   }
 
   displayButton = () => {
     const { maxPage, currentPage } = this.state
-    if (maxPage === currentPage) {
-      return (
-        <button className="icon danger">
-          <p> No Videos</p>
-        </button>
-      )
-    } else {
-      return (
-        <button className="icon" onClick={this.loadAdditionalVideos}>
-          <p>Load More</p>
-        </button>
-      )
-    }
+    return maxPage === currentPage ? (
+      <button className="icon danger">
+        <p> No Videos</p>
+      </button>
+    ) : (
+      <button className="icon" onClick={this.loadAdditionalVideos}>
+        <p>Load More</p>
+      </button>
+    )
   }
 
   toggleOpen = (param: boolean) => this.setState({ isClosed: param })
@@ -180,17 +140,16 @@ export default class Wrapper extends Component<{}, AppState> {
       return (
         <div className="wrapper">
           <div className="chart-wrapper">
-            {Object.keys(this.state.uploadData).length ? (
+            <div className="chart">
               <VideoChart chartData={this.state.uploadData} />
-            ) : null}
+            </div>
+            <div className="chart">{this.renderStats()}</div>
           </div>
-          <section
-            className={isClosed ? `stat-wrapper closed` : `stat-wrapper open`}
-          >
-            {this.renderStats()}
-          </section>
-          {this.displayButton()}
-          <div className="card-wrapper">{this.renderVideos()}</div>
+
+          <div className="card-wrapper">
+            {this.displayButton()}
+            {this.renderVideos()}
+          </div>
         </div>
       )
     } else {

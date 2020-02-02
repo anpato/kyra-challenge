@@ -13,11 +13,14 @@ export interface AppState {
 }
 
 export interface CardProps {
-  children: React.ReactElement[]
+  videos: any
+  displayStats: Function
+  selectedIndex: number | null
+  clearStats: Function
 }
 
 export interface ChartProps {
-  chartData: ChartData
+  chartData: any
 }
 
 export interface ChartData {
